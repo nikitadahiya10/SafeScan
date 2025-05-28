@@ -1,1 +1,1 @@
-# SafeScan
+Virus Detection mechanism
