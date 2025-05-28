@@ -1,0 +1,186 @@
+body {
+    font-family: 'Lucida Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.container {
+    display: flex;                              /*for side-by-side layout*/
+    height: 100%;
+    width: 100%;
+    background-color: rgb(228, 227, 255);               /*light lavender shade*/
+}
+
+.sidebar {
+    background-color: rgb(19, 19, 22);
+    width: 300px;
+    padding: 20px;
+    color: #ffffff;
+    display: flex;                       /*flexible layout for child elements*/
+    flex-direction: column;              /*arranges child elements in a vertical column*/
+    justify-content: space-between;        /*top to bottm space*/
+}
+#ss{
+    font-size: 30px;
+    margin-bottom: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 15px; 
+}
+
+.nav-links li {
+    margin: 20px 0;          /*20px vertical space between each list item*/
+    cursor: pointer;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 5px;
+    transition: background-color 0.5s;            /*Smoothly animates background-color changes over 0.5 seconds*/
+}
+
+.nav-links li:hover {
+    background-color: #7cb5ee;
+}
+.feedback-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.feedback-button:hover {
+    background-color: #2980b9;
+}
+
+.home {
+    padding: 35px;
+    width: 100%;
+}
+
+.home img{
+    height: 250px;
+    width: 350px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+h2 {
+    color: #2c3e50;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+a{
+    text-decoration: none;
+    color: white;
+}
+
+/* Dark Mode */
+.dark-mode {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+/* Sidebar */
+.sidebar {
+    background: rgba(19, 19, 22, 0.9);
+    color: white;
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+.dark-mode .sidebar {
+    background: rgba(40, 40, 40, 0.9);
+}
+
+/* Navigation Links */
+.nav-links li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .nav-links li:hover {
+    background-color: #444;
+}
+
+.footer{
+    bottom: 0;
+    width: 100%;
+    background-color:black;
+    color: white;
+    text-align: center;
+    padding: 0.2px;
+    font-size:12px;
+}
+
+.modal {
+    display: none; 
+    position: fixed;       /*Fixes the modal in place, regardless of page scrolling*/
+    z-index: 1;          /* Places the modal above other elements with a lower z-index*/
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto;         /* Allows scrolling if content overflows*/
+    background-color: rgba(0,0,0,0.4); 
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;      /*enters the modal horizontally and gives a 15% margin from the top of the page*/
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; 
+    max-width: 500px; /* Limit max width */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.close {
+    color: #aaa;
+    float: right;           /* Aligns the close button to the right side of the modal header*/
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

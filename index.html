@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeScan Antivirus</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <h1 class="logo">SafeScan</h1>
+            <ul class="nav-links">
+                <li><a href="#" class="active">🏠 Home</a></li>
+                <li><a href="scans.html">🔍 Scans</a></li>
+                <li><a href="quarantine.html">🔒 Quarantine</a></li>
+                <li><a href="#">⚙️ Settings</a></li>
+            </ul>
+            <button class="feedback-button" onclick="openFeedbackModal()">💬 Send Feedback</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="home">
+            <img src="SafeScan.png" alt="SafeScan Logo" class="logo-img">
+            <p>SafeScan provides essential protection for your Windows PC. Our powerful scanner keeps your files safe from harmful viruses.</p>
+            <h2>🔹 Features:</h2>
+            <ul>
+                <li><b>Quick Scan:</b> Fast check for common threats.</li>
+                <li><b>Full Scan:</b> Deep scan of your entire system.</li>
+                <li><b>Custom Scan:</b> Select files or folders to scan.</li>
+                <li><b>Quarantine:</b> Isolate suspicious files securely.</li>
+                <li><b>User-Friendly Interface:</b> Simple and easy to use.</li>
+            </ul>
+
+            <h2>🔹 Security Tips:</h2>
+            <ul>
+                <li>✔ Keep Your Software Updated</li>
+                <li>✔ Use Strong Passwords</li>
+                <li>✔ Backup Your Data Regularly</li>
+            </ul>
+        </main>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFeedbackModal()">&times;</span>
+            <h2>Send Feedback</h2>
+            <form id="feedbackForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="message">Feedback:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 SafeScan Antivirus. All rights reserved.</p>
+    </footer>
+    
+
+    
+    <script>
+    function openScansPage() 
+    {
+    window.location.href = "scans.html";
+    }
+
+    function openFeedbackModal() 
+    {
+    // Clear the form fields before displaying the modal
+    document.getElementById("name").value = "";
+    document.getElementById("message").value = "";
+
+    // Show the modal
+    document.getElementById("feedbackModal").style.display = "block";
+    }
+
+    function closeFeedbackModal() 
+    {
+    // Hide the modal
+    document.getElementById("feedbackModal").style.display = "none";
+    }
+
+    document.getElementById("feedbackForm").onsubmit = function (event) 
+    {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    // Display a thank you message
+    alert("Feedback submitted! Thank you.");
+
+    // Clear the form fields
+    document.getElementById("name").value = "";
+    document.getElementById("message").value = "";
+
+    // Close the modal
+    closeFeedbackModal();
+    };
+
+    window.onclick = function (event) 
+    {
+    const modal = document.getElementById("feedbackModal");
+    if (event.target === modal) 
+    {
+        
+        closeFeedbackModal();
+    }
+    };
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeScan - Select Scan Type</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            text-align: center;
+        }
+        .navbar {
+            background-color: #343a40;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        .navbar ul li {
+            margin: 0 15px;
+        }
+        .navbar ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        .navbar ul li a:hover, .navbar ul li a.active {
+            color: #17a2b8;
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+        }
+        .scan-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .scan-button {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 22px;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 250px;
+            justify-content: center;
+        }
+        .scan-button:hover {
+            background: linear-gradient(135deg, #218838, #1e7e34);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        #scanPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+        }
+        #scanPopup h3 {
+            margin-bottom: 15px;
+        }
+        .popup-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        .popup-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .popup-buttons .cancel {
+            background: #dc3545;
+            color: white;
+        }
+        .popup-buttons .cancel:hover {
+            background: #c82333;
+        }
+        .popup-buttons .ok {
+            background: #007bff;
+            color: white;
+        }
+        .popup-buttons .ok:hover {
+            background: #0056b3;
+        }
+        #results {
+    margin-top: 25px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    width: 80%;
+    max-width: 450px;
+    text-align: left;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    word-wrap: break-word;
+}
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>SafeScan</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="scans.html" class="active">Scans</a></li>
+            <li><a href="quarantine.html">Quarantine</a></li>
+           <li><a href="#">⚙️ Settings</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h1>Select Scan Type</h1>
+        <div class="scan-container">
+            <button class="scan-button" onclick="startFullScan()">🔍 Start Full Scan</button>
+            <button class="scan-button" onclick="selectCustomScan()">📂 Custom Scan</button>                        
+            <button id="quickScanBtn" class="scan-button" onclick="startQuickScan()">⚡ Quick Scan</button>
+        </div>
+        
+        <!-- Popup for entering absolute path -->
+        <div id="pathInputPopup" style="display: none;">
+            <h3>Enter Absolute Path</h3>
+            <input type="text" id="absolutePathInput" placeholder="Enter path here..." style="width: 80%; padding: 10px;">
+            <button onclick="startCustomScanFromPath()">Scan</button>
+            <button onclick="cancelPathInput()">Cancel</button>
+        </div>
+        
+        <div id="scanPopup">
+            <h3>Scanning in Progress...</h3>
+            <p id="scanStatus">Please wait...</p>
+            <div class="popup-buttons">
+                <button onclick="stopScan()" class="cancel" id="stopBtn" >Cancel Scan</button>
+            </div>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+    <footer>
+        <p>&copy; 2024 SafeScan Antivirus. All rights reserved.</p>
+    </footer>
+    <script>
+        let scanProcess = null;
+    
+        function startFullScan() {
+            let scanBtn = document.querySelector(".scan-button");
+            scanBtn.disabled = true; // ✅ Disable button
+
+            showScanPopup();
+            fetch("http://127.0.0.1:5000/start-full-scan")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("scanPopup").style.display = "none"; 
+                    scanBtn.disabled = false; // ✅ Enable button
+
+                    let resultsDiv = document.getElementById("results");
+
+                    if (data.infected_files && data.infected_files.length > 0) {
+                        let resultHTML = "<h3>🚨 Threats Found!</h3><ul>";
+                        data.infected_files.forEach(file => {
+                            resultHTML += `<li><b>${file.malware_name}</b> (${file.threat_level}) - ${file.file}</li>`;
+                        });
+                        resultHTML += "</ul>";
+                        resultsDiv.innerHTML = resultHTML;
+                    } else {
+                        resultsDiv.innerHTML = "<h3>✅ No Threats Found!</h3>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error: " + error.message);
+                    scanBtn.disabled = false; // ✅ Enable button in case of error
+                });
+        }
+
+        function startQuickScan() {
+            let quickScanBtn = document.getElementById("quickScanBtn"); // ✅ Correct Selection
+            if (!quickScanBtn) {
+                console.error("Quick Scan button not found!"); // Debugging help
+                return;
+            }
+
+            quickScanBtn.disabled = true; // ✅ Disable button
+
+            showScanPopup();
+            fetch("http://127.0.0.1:5000/start-quick-scan")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("scanPopup").style.display = "none"; 
+                    quickScanBtn.disabled = false; // ✅ Enable button
+
+                    let resultsDiv = document.getElementById("results");
+
+                    if (data.infected_files && data.infected_files.length > 0) {
+                        let resultHTML = "<h3>🚨 Threats Found in Quick Scan!</h3><ul>";
+                        data.infected_files.forEach(file => {
+                            resultHTML += `<li><b>${file.malware_name}</b> (${file.threat_level}) - ${file.file}</li>`;
+                        });
+                        resultHTML += "</ul>";
+                        resultsDiv.innerHTML = resultHTML;
+                    } else {
+                        resultsDiv.innerHTML = "<h3>✅ No Threats Found in Quick Scan!</h3>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error: " + error.message);
+                    quickScanBtn.disabled = false; // ✅ Enable button in case of error
+                });
+        }
+
+        function selectCustomScan() {
+            document.getElementById("pathInputPopup").style.display = "block"; // Show the input field
+        }
+
+        function startCustomScanFromPath() {
+            const path = document.getElementById("absolutePathInput").value;
+            if (!path) {
+                alert("Please enter a valid path.");
+                return;
+            }
+
+            showScanPopup();
+            fetch("http://127.0.0.1:5000/start-custom-scan", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ path: path })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("scanPopup").style.display = "none"; 
+                let resultsDiv = document.getElementById("results");
+
+                if (data.infected_files && data.infected_files.length > 0) {
+                    let resultHTML = "<h3>🚨 Threats Found in Custom Scan!</h3><ul>";
+                    data.infected_files.forEach(file => {
+                        resultHTML += `<li><b>${file.malware_name}</b> (${file.threat_level}) - ${file.file}</li>`;
+                    });
+                    resultHTML += "</ul>";
+                    resultsDiv.innerHTML = resultHTML;
+                } else {
+                    resultsDiv.innerHTML = "<h3>✅ No Threats Found in Custom Scan!</h3>";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error: " + error.message);
+            });
+        }
+
+        function cancelPathInput() {
+            document.getElementById("pathInputPopup").style.display = "none"; // Hide the input field
+        }
+
+        function stopScan() {
+            fetch("http://127.0.0.1:5000/stop-scan", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Scan Stopped:", data);
+                    alert(data.message);  // ✅ Corrected from data.status to data.message
+                    document.getElementById("scanPopup").style.display = "none";
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error stopping scan");
+                });
+        }
+
+        function showScanPopup() {
+            document.getElementById("scanPopup").style.display = "block";
+        }
+    </script>
+</body>
+</html>

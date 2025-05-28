@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeScan - Quarantine</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+        }
+        .navbar {
+            background-color: #343a40;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        .navbar ul li {
+            margin: 0 15px;
+        }
+        .navbar ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        .navbar ul li a:hover,
+        .navbar ul li a.active {
+            color: #17a2b8;
+        }
+
+        .main-content {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        #quarantine-list {
+            margin-top: 25px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            width: 80%;
+            max-width: 800px;
+            text-align: left;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+            transition: background-color 0.3s;
+        }
+        .file-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .file-info {
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-info strong {
+            display: block;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-info span {
+            display: block;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-info small {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .options button {
+            margin-left: 5px;
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .options button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .delete-btn {
+            background-color: #d9534f;
+            color: white;
+        }
+
+        .open-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>SafeScan</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="scans.html">Scans</a></li>
+            <li><a href="quarantine.html" class="active">Quarantine</a></li>
+            <li><a href="#">⚙️ Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Quarantine Files</h1>
+        <div id="quarantine-list">
+            <p>Loading quarantined files...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 SafeScan Antivirus. All rights reserved.</p>
+    </footer>
+
+    <script>
+        async function loadQuarantineFiles() {
+            let response = await fetch('http://127.0.0.1:5000/get-scan-results');
+            let data = await response.json();
+            console.log(data);
+
+            let files = data.scan_results;
+
+            let quarantineList = document.getElementById('quarantine-list');
+            quarantineList.innerHTML = "";
+
+            if (!files || files.length === 0) {
+                quarantineList.innerHTML = "<p>No quarantined files found.</p>";
+                return;
+            }
+
+            files.forEach(file => {
+                let fileDiv = document.createElement('div');
+                fileDiv.classList.add('file-item');
+
+                fileDiv.innerHTML = `
+    <div class="file-info" title="${file.file_path}">
+        <strong title="${file.malware_name}">${file.malware_name}</strong>
+        <span title="${file.file_path}">${file.file_path}</span><br>
+        <small>Threat Level: ${file.threat_level} | Date: ${file.scan_date || 'Unknown'}</small>
+    </div>
+    <div class="options">
+        <button class="delete-btn" onclick="deleteFile('${file.file_path.replace(/\\/g, '\\\\')}')">Delete</button>
+        <button class="open-btn" onclick="openFile('${file.file_path.replace(/\\/g, '\\\\')}')">Open</button>
+    </div>
+`;
+                quarantineList.appendChild(fileDiv);
+            });
+        }
+
+        function openFile(fileId) {
+    console.log("[DEBUG] Sending File ID:", fileId);  // ✅ Check this in browser console
+    fetch('http://127.0.0.1:5000/open_quarantine_file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: fileId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("File opened successfully!");
+        } else {
+            alert("Failed to open file. Please check if the file is accessible.");
+        }
+    })
+    .catch(error => {
+        alert("Error occurred while trying to open the file. Please try again.");
+        console.error("Error opening file:", error);  // Log error for debugging
+    });
+}
+
+
+
+async function deleteFile(filePath) {
+    let response = await fetch('http://127.0.0.1:5000/delete_quarantine_file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file_path: filePath })
+    });
+    let result = await response.json();
+    if (result.success) {
+        alert("File deleted successfully!");
+        loadQuarantineFiles();
+    } else {
+        alert("Error deleting file.");
+    }
+}
+
+
+        document.addEventListener("DOMContentLoaded", loadQuarantineFiles);
+    </script>
+</body>
+</html>
